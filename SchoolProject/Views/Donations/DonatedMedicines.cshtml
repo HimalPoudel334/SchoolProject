@@ -1,0 +1,95 @@
+﻿@model IEnumerable<SchoolProject.Models.Donation>
+
+@{
+    ViewData["Title"] = "Request Medicine";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Request</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Medicine.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Medicine.GenericName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Medicine.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Medicine.Mg)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Medicine.ExpiryDate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (DateTime.Compare(DateTime.Now, item.Medicine.ExpiryDate) < 0)
+            {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Medicine.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Medicine.GenericName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Medicine.Mg)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Medicine.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @{
+                    string expiryDate = item.Medicine.ExpiryDate.ToString("MMM/yyyy");
+                }
+                @Html.DisplayFor(modelItem => expiryDate)
+            </td>
+            <td>
+                <a class="btn btn-info" asp-action="Create" asp-controller="Requests" asp-route-id="@item.Id">Request</a>
+            </td>
+        </tr>
+            }
+            else
+            {
+                <tr class="table-danger">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Medicine.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Medicine.GenericName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Medicine.Mg)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Medicine.Description)
+                    </td>
+                    <td>
+                        @{
+                            string expiryDate = item.Medicine.ExpiryDate.ToString("MMM/yyyy");
+                        }
+                        @Html.DisplayFor(modelItem => expiryDate)
+                    </td>
+                    <td class="text-danger">
+                        Expired
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+

@@ -1,0 +1,26 @@
+﻿@page
+@model SchoolProject.Areas.Identity.Pages.Account.ChooseAccountTypeModel
+
+@{
+    <h3>Choose who you are</h3>
+    <div>
+        <div>
+            To register as an NGO you must have
+            <ul>
+                <li>Valid registration number</li>
+                <li>Valid ngo email address</li>
+                <li>Contact number registered to ngo</li>
+                <li>Pan number</li>
+            </ul>
+            <a asp-page="RegisterNgo">Register as an NGO</a>
+        </div>
+        <div>
+            To register as a donor you must have
+            <ul>
+                <li>an email address</li>
+                <li>contact number</li>
+            </ul>
+            <a asp-page="Register">Register as Donor</a>
+        </div>
+    </div>
+}
