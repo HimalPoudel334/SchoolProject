@@ -15,13 +15,13 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Medicine" class="control-label"></label>
-                <input type ="text" asp-for="Medicine.Id" class="form-control" hidden />
+                <input type ="text" asp-for="Medicine" class="form-control" hidden />
                 <input type ="text" asp-for="Medicine.Name" class="form-control" readonly />
                 <span asp-validation-for="Medicine" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RequestingNgo" class="control-label"></label>
-                <input type="text" asp-for="RequestingNgo.Id" class="form-control" hidden/>
+                <input type="text" asp-for="RequestingNgo" class="form-control" hidden/>
                 <input type="text" asp-for="RequestingNgo.Name" class="form-control" readonly/>
                 <span asp-validation-for="RequestingNgo" class="text-danger"></span>
             </div>

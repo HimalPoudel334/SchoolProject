@@ -1,4 +1,5 @@
-﻿@model IEnumerable<SchoolProject.Models.Donation>
+
+@model IEnumerable<SchoolProject.Models.Donation>
 
 @{
     ViewData["Title"] = "Request Medicine";
@@ -26,6 +27,9 @@
                 @Html.DisplayNameFor(model => model.Quantity)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.QuantityRemaining)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Medicine.ExpiryDate)
             </th>
             <th></th>
@@ -36,32 +40,35 @@
         {
             if (DateTime.Compare(DateTime.Now, item.Medicine.ExpiryDate) < 0)
             {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Medicine.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Medicine.GenericName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Medicine.Mg)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Medicine.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @{
-                    string expiryDate = item.Medicine.ExpiryDate.ToString("MMM/yyyy");
-                }
-                @Html.DisplayFor(modelItem => expiryDate)
-            </td>
-            <td>
-                <a class="btn btn-info" asp-action="Create" asp-controller="Requests" asp-route-id="@item.Id">Request</a>
-            </td>
-        </tr>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Medicine.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Medicine.GenericName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Medicine.Mg)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Medicine.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.QuantityRemaining)
+                    </td>
+                    <td>
+                        @{
+                            string expiryDate = item.Medicine.ExpiryDate.ToString("MMM/yyyy");
+                        }
+                        @Html.DisplayFor(modelItem => expiryDate)
+                    </td>
+                    <td>
+                        <a class="btn btn-info" asp-action="Create" asp-controller="Requests" asp-route-id="@item.Id">Request</a>
+                    </td>
+                </tr>
             }
             else
             {
@@ -84,12 +91,18 @@
                         }
                         @Html.DisplayFor(modelItem => expiryDate)
                     </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.QuantityRemaining)
+                    </td>
                     <td class="text-danger">
                         Expired
                     </td>
                 </tr>
             }
-        }
+         }
     </tbody>
 </table>
 

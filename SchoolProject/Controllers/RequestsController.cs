@@ -77,25 +77,27 @@ namespace SchoolProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (request.Quantity > don.Quantity || request.Quantity <= 0)
+                var donation = await _context.Donations.FindAsync(don.Id);
+                if (request.Quantity > donation.QuantityRemaining || request.Quantity <= 0)
                 {
-                    ModelState.AddModelError(string.Empty, "Only " + don.Quantity + " Medicines in stock");
+                    ModelState.AddModelError(string.Empty, "Only " + don.QuantityRemaining + " Medicines left in stock");
+                    ModelState.AddModelError(string.Empty, "Quantity must be greater than zero");
                     request.Medicine = don.Medicine;
                     request.RequestingNgo = don.ReceiverNgo;
                     return View(request);
                 }
 
-                var donation = await _context.Donations.FindAsync(don.Id);
-                donation.Quantity -= request.Quantity;
+                
+                donation.QuantityRemaining -= request.Quantity;
                 var user = await _userManager.GetUserAsync(HttpContext.User);
                 var requestor = await _context.Donors.FindAsync(user.Id);
-                var donorNgo = await _context.Ngos.FindAsync(request.RequestingNgo.Id);
-                var medicine = await _context.Medicines.FindAsync(request.Medicine.Id);
+                //var donorNgo = await _context.Ngos.FindAsync(request.RequestingNgo.Id);
+                //var medicine = await _context.Medicines.FindAsync(request.Medicine.Id);
 
                 request.RequestDate = DateTime.Now;
-                request.Medicine = medicine;
+                //request.Medicine = medicine;
                 request.Requestor = requestor;
-                request.RequestingNgo = donorNgo;
+                //request.RequestingNgo = donorNgo;
                 _context.Donations.Update(donation);
 
                 _context.Add(request);

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SchoolProject.Data;
 using SchoolProject.Models;
 
@@ -56,13 +59,14 @@ namespace SchoolProject.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,GenericName,Mg,Description,ExpiryDate")] Medicine medicine)
+        public IActionResult Create([Bind("Id,Name,GenericName,Mg,Description,ExpiryDate")] Medicine medicine)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(medicine);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Create", "Donations", new { medicine.Id });
+                //yea I am ashmed of 
+                string medicineString = JsonConvert.SerializeObject(medicine);
+                HttpContext.Session.SetString("medicine", medicineString);
+                return RedirectToAction("Create", "Donations", medicine);
             }
             return View(medicine);
         }

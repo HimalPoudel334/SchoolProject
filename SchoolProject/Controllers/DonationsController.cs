@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SchoolProject.Data;
 using SchoolProject.Models;
 
@@ -37,6 +38,19 @@ namespace SchoolProject.Controllers
             return View(donates);
         }
 
+        public async Task<IActionResult> MyDonations()
+        {
+            var user = await _userManager.GetUserAsync(this.User);
+            try {
+                var donates = await _context.Donations.Include(d => d.Medicine).Where(d => d.Donor.Id == user.Id).ToListAsync();
+                return View(donates);
+            }
+            catch (Exception)
+            {
+                return View();
+            }
+        }
+
         // GET: Donations/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -56,21 +70,25 @@ namespace SchoolProject.Controllers
         }
 
         // GET: Donations/Create
-        public async Task<IActionResult> Create(int id)
+        public async Task<IActionResult> Create(Medicine medicine)
         {
-            Medicine med = await _context.Medicines.FindAsync(id);
-
-            if (med != null)
+            try
             {
-                //var ngos = await _userManager.Users.OfType<Ngo>().ToListAsync();
-                var ngos = await _context.Ngos.ToListAsync();
-                ViewBag.NgoList = new SelectList(ngos, "Id", "Name");
-
-                var donation = new Donation()
+                var medFromSession = JsonConvert.DeserializeObject<Medicine>(HttpContext.Session.GetString("medicine"));
+                if (medicine != null && medFromSession != null && medFromSession.Equals(medicine))
                 {
-                    Medicine = med
-                };
-                return View(donation);
+                    var ngos = await _context.Ngos.ToListAsync();
+                    ViewBag.NgoList = new SelectList(ngos, "Id", "Name");
+
+                    var donation = new Donation()
+                    {
+                        Medicine = medicine
+                    };
+                    return View(donation);
+                }
+            }catch(Exception)
+            {
+                return NotFound();
             }
             return NotFound();
         }
@@ -82,19 +100,27 @@ namespace SchoolProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                //donation.Id = 0;
-                donation.Medicine = await _context.Medicines.FindAsync(donation.Medicine.Id);
-                donation.DonationTime = DateTime.UtcNow;
-                var loggedInUser = await _userManager.GetUserAsync(this.User);
-                donation.Donor = await _context.Donors.FindAsync(loggedInUser.Id);
-                donation.ReceiverNgo = await _context.Ngos.FindAsync(donation.ReceiverNgo.Id);
+                try
+                {
+                    var medFromSession = JsonConvert.DeserializeObject<Medicine>(HttpContext.Session.GetString("medicine"));
+                    HttpContext.Session.Remove("medicine");
 
-                _context.Add(donation);
-                await _context.SaveChangesAsync();
+                    donation.Medicine = medFromSession;
+                    var loggedInUser = await _userManager.GetUserAsync(HttpContext.User);
+                    donation.Donor = await _context.Donors.FindAsync(loggedInUser.Id);
+                    donation.ReceiverNgo = await _context.Ngos.FindAsync(donation.ReceiverNgo.Id);
+                    donation.QuantityRemaining = donation.Quantity;
 
-                return RedirectToAction(nameof(Index));
+                    _context.Add(donation);
+                    await _context.SaveChangesAsync();
 
-                //return Json(donation);  
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception)
+                {
+                    return View(donation);
+                }
+
             }
           
             return View(donation);
@@ -184,5 +210,6 @@ namespace SchoolProject.Controllers
         {
             return _context.Donations.Any(e => e.Id == id);
         }
+
     }
 }

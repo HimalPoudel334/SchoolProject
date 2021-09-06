@@ -1,0 +1,111 @@
+
+@model IEnumerable<SchoolProject.Models.Donation>
+
+@{
+    ViewData["Title"] = "My Donations";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>My Donations</h1>
+
+@if (!Model.Any())
+{
+    <h2>Ops! Looks like you havent donated any medicines yet.</h2>
+    <a asp-action="Create" class="btn btn-primary" asp-controller="Medicines">Donate</a>
+}
+else
+{
+    <a asp-action="Create" class="btn btn-primary"  asp-controller="Medicines">Create</a>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Medicine.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Medicine.GenericName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Medicine.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Medicine.Mg)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.QuantityRemaining)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Medicine.ExpiryDate)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                if (DateTime.Compare(DateTime.Now, item.Medicine.ExpiryDate) < 0)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Medicine.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Medicine.GenericName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Medicine.Mg)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Medicine.Description)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Quantity)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.QuantityRemaining)
+                        </td>
+                        <td>
+                            @{
+                                string expiryDate = item.Medicine.ExpiryDate.ToString("MMM/yyyy");
+                            }
+                            @Html.DisplayFor(modelItem => expiryDate)
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr class="table-danger">
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Medicine.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Medicine.GenericName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Medicine.Mg)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Medicine.Description)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Quantity)
+                        </td>
+                        <td>
+                            @Html.DisplayNameFor(modelItem => item.QuantityRemaining)
+                        </td>
+                        <td>
+                            @{
+                                string expiryDate = item.Medicine.ExpiryDate.ToString("MMM/yyyy");
+                            }
+                            @Html.DisplayFor(modelItem => expiryDate)
+                        </td>
+                    </tr>
+                }
+             }
+        </tbody>
+    </table>
+}
+
