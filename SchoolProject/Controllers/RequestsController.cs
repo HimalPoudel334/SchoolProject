@@ -91,13 +91,13 @@ namespace SchoolProject.Controllers
                 donation.QuantityRemaining -= request.Quantity;
                 var user = await _userManager.GetUserAsync(HttpContext.User);
                 var requestor = await _context.Donors.FindAsync(user.Id);
-                //var donorNgo = await _context.Ngos.FindAsync(request.RequestingNgo.Id);
-                //var medicine = await _context.Medicines.FindAsync(request.Medicine.Id);
+                var donorNgo = await _context.Ngos.FindAsync(request.RequestingNgo.Id);
+                var medicine = await _context.Medicines.FindAsync(request.Medicine.Id);
 
                 request.RequestDate = DateTime.Now;
-                //request.Medicine = medicine;
+                request.Medicine = medicine;
                 request.Requestor = requestor;
-                //request.RequestingNgo = donorNgo;
+                request.RequestingNgo = donorNgo;
                 _context.Donations.Update(donation);
 
                 _context.Add(request);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -51,6 +52,29 @@ namespace SchoolProject.Controllers
             }
         }
 
+        // GET: Donations/Invoice/5
+        public async Task<IActionResult> Invoice(int? id)
+        {
+            /*int? donationId = Convert.ToInt32(HttpContext.Session.GetString("donationId"));
+            if (id == null || donationId == null || donationId != id)
+            {
+                HttpContext.Session.Remove("donationId");
+                return NotFound();
+            }*/
+            if (id == null) return NotFound();
+
+            var donation = await _context.Donations.Include(d => d.Donor).Include(d => d.Medicine).Include(d => d.ReceiverNgo)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (donation == null)
+            {
+                HttpContext.Session.Remove("donationId");
+                return NotFound();
+            }
+
+            HttpContext.Session.Remove("donationId");
+            return View(donation);
+        }
+
         // GET: Donations/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -77,7 +101,18 @@ namespace SchoolProject.Controllers
                 var medFromSession = JsonConvert.DeserializeObject<Medicine>(HttpContext.Session.GetString("medicine"));
                 if (medicine != null && medFromSession != null && medFromSession.Equals(medicine))
                 {
-                    var ngos = await _context.Ngos.ToListAsync();
+                    List<Ngo> ngos = null;
+
+                    if (this.User.IsInRole("Ngo"))
+                    {
+                        var user = await _userManager.GetUserAsync(this.User);
+                        ngos = await _context.Ngos.Where(n => n.Id != user.Id).ToListAsync();
+                    }
+                    else
+                    {
+                        ngos = await _context.Ngos.ToListAsync();
+                    }
+                    
                     ViewBag.NgoList = new SelectList(ngos, "Id", "Name");
 
                     var donation = new Donation()
@@ -113,8 +148,9 @@ namespace SchoolProject.Controllers
 
                     _context.Add(donation);
                     await _context.SaveChangesAsync();
+                    HttpContext.Session.SetString("donationId", donation.Id.ToString());
+                    return RedirectToAction(nameof(Invoice), donation.Id);
 
-                    return RedirectToAction(nameof(Index));
                 }
                 catch (Exception)
                 {
@@ -143,8 +179,6 @@ namespace SchoolProject.Controllers
         }
 
         // POST: Donations/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Quantity,DonationTime,Completed")] Donation donation)
@@ -178,6 +212,7 @@ namespace SchoolProject.Controllers
         }
 
         // GET: Donations/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -196,6 +231,7 @@ namespace SchoolProject.Controllers
         }
 
         // POST: Donations/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -210,6 +246,5 @@ namespace SchoolProject.Controllers
         {
             return _context.Donations.Any(e => e.Id == id);
         }
-
     }
 }

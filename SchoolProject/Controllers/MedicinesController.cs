@@ -25,6 +25,7 @@ namespace SchoolProject.Controllers
         }
 
         // GET: Medicines
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Medicines.ToListAsync());
@@ -55,8 +56,6 @@ namespace SchoolProject.Controllers
         }
 
         // POST: Medicines/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("Id,Name,GenericName,Mg,Description,ExpiryDate")] Medicine medicine)

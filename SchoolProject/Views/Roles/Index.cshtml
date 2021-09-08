@@ -1,38 +1,45 @@
-﻿@using Microsoft.AspNetCore.Identity;
-@model IEnumerable<IdentityRole>
+﻿
+@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityRole>
 
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "All Roles";
 }
 
-<h1>Index</h1>
-@if(Model.Any())
+<h1>All Roles</h1>
+
+@if (Model.Any())
 {
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <a class="btn btn-primary mb-3" asp-action="Create">Add new role</a>
+
+    foreach (var role in Model)
+    {
+        <div class="card mb-3 w-50">
+            <div class="card-header">
+                Role Id : @role.Id
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">@role.Name</h5>
+            </div>
+            <div class="card-footer">
+                <a asp-action="Edit" class="btn btn-primary" asp-route-id="@role.Id" >Edit</a>
+                <a asp-action="" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    }
 }
 else
 {
-    <h2>Ops! Looks like there is no roles yet.</h2>
+    <div class="card">
+        <div class="card-header">
+            No roles created yet
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">
+                Use the button below to create a role
+            </h5>
+            <a class="btn btn-primary" asp-action="Create">
+                Create Role
+            </a>
+        </div>
+    </div>
 }
-<p>
-    <a asp-action="Create">Create New</a>
-</p>

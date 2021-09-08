@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SchoolProject.Models
+namespace SchoolProject.ViewModels
 {
     public class UserRoles
     {

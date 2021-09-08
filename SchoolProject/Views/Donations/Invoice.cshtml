@@ -1,0 +1,66 @@
+﻿@model SchoolProject.Models.Donation
+
+@{
+    ViewData["Title"] = "Invoice";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Invoice</h1>
+
+<div id="printableArea">
+    <h4>Please courier the medicine with following invoice.</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Medicine Id
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Medicine.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Medicine.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Medicine.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Donor)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Donor.FirstName) @Html.DisplayFor(model => model.Donor.LastName)
+        </dd>
+        <dt class="col-sm-2">
+            Donation Id
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Quantity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Quantity)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ReceiverNgo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ReceiverNgo.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ReceiverNgo.Address)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ReceiverNgo.Address)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ReceiverNgo.PhoneNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ReceiverNgo.PhoneNumber)
+        </dd>
+    </dl>
+</div>
+<div>
+    <button class="btn btn-primary" onclick="printDiv('printableArea')">Print Invoice</button>
+</div>
