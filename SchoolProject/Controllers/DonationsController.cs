@@ -27,6 +27,7 @@ namespace SchoolProject.Controllers
             _userManager = userManager;
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Donations
         public async Task<IActionResult> Index()
         {
@@ -39,12 +40,21 @@ namespace SchoolProject.Controllers
             return View(donates);
         }
 
+        [HttpGet]
         public async Task<IActionResult> MyDonations()
         {
             var user = await _userManager.GetUserAsync(this.User);
+            List<Donation> donations = null;
             try {
-                var donates = await _context.Donations.Include(d => d.Medicine).Where(d => d.Donor.Id == user.Id).ToListAsync();
-                return View(donates);
+                if (await _userManager.IsInRoleAsync(user, "Ngo"))
+                {
+                    donations = await _context.Donations.Include(d => d.Medicine).Include(d => d.Donor).Where(d => d.ReceiverNgo.Id == user.Id).ToListAsync();
+                }
+                else
+                { 
+                    donations = await _context.Donations.Include(d => d.Medicine).Where(d => d.Donor.Id == user.Id).ToListAsync();
+                }
+                return View(donations);
             }
             catch (Exception)
             {
@@ -53,18 +63,19 @@ namespace SchoolProject.Controllers
         }
 
         // GET: Donations/Invoice/5
-        public async Task<IActionResult> Invoice(int? id)
+        public async Task<IActionResult> Invoice()
         {
+            //uncomment this and add int? id paramter to the function if want to generate invoice for individual donation
             /*int? donationId = Convert.ToInt32(HttpContext.Session.GetString("donationId"));
             if (id == null || donationId == null || donationId != id)
             {
                 HttpContext.Session.Remove("donationId");
                 return NotFound();
             }*/
-            if (id == null) return NotFound();
 
+            var user = await _userManager.GetUserAsync(this.User);
             var donation = await _context.Donations.Include(d => d.Donor).Include(d => d.Medicine).Include(d => d.ReceiverNgo)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Where(m => m.Donor.Id == user.Id).ToListAsync();
             if (donation == null)
             {
                 HttpContext.Session.Remove("donationId");
@@ -72,6 +83,8 @@ namespace SchoolProject.Controllers
             }
 
             HttpContext.Session.Remove("donationId");
+            ViewBag.Donor = user;
+            
             return View(donation);
         }
 
@@ -82,9 +95,9 @@ namespace SchoolProject.Controllers
             {
                 return NotFound();
             }
-
-            var donation = await _context.Donations
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _userManager.GetUserAsync(this.User);
+            var donation = await _context.Donations.Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo)
+                .FirstOrDefaultAsync(m => m.Id == id && m.Donor.Id == user.Id);
             if (donation == null)
             {
                 return NotFound();
@@ -149,7 +162,7 @@ namespace SchoolProject.Controllers
                     _context.Add(donation);
                     await _context.SaveChangesAsync();
                     HttpContext.Session.SetString("donationId", donation.Id.ToString());
-                    return RedirectToAction(nameof(Invoice), donation.Id);
+                    return RedirectToAction(nameof(MyDonations));
 
                 }
                 catch (Exception)
@@ -197,7 +210,7 @@ namespace SchoolProject.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!DonationExists(donation.Id))
+                    if (!await DonationExists(donation.Id))
                     {
                         return NotFound();
                     }
@@ -242,9 +255,62 @@ namespace SchoolProject.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool DonationExists(int id)
+        private async Task<bool> DonationExists(int id)
         {
-            return _context.Donations.Any(e => e.Id == id);
+            return await _context.Donations.AnyAsync(e => e.Id == id);
+        }
+
+        //very bad but don't touch it
+        public async Task<IActionResult> Search(string q, string page)
+        {
+            var pages = new List<string>() //ya unnecessary memory consumption
+            {
+                "Index", "MyDonations", "DonatedMedicines"
+            };
+            if (string.IsNullOrEmpty(page) || !pages.Contains(page))
+            {
+                return NotFound();
+            }
+            if(string.IsNullOrEmpty(q))
+            {
+                return RedirectToAction(page);
+            }
+
+            q = q.ToLower();
+            var user = await _userManager.GetUserAsync(this.User);
+            IEnumerable<Donation> allDonations = null;
+            IEnumerable<Donation> donations = null;
+            
+            //yea i know its cheating, but upaya tha xaina
+            if (page.Equals("MyDonations"))
+            {
+                allDonations = await _context.Donations.Include(d => d.Medicine).Where(d => d.Donor.Id == user.Id).ToListAsync();
+            }
+            else if (page.Equals("Index"))
+            {
+                allDonations = await _context.Donations.Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo).ToListAsync();
+            }
+            else if (page.Equals("DonatedMedicines"))
+            {
+                allDonations = await _context.Donations.Include(d => d.Medicine).Where(d => d.Completed).ToListAsync();
+            }
+            try
+            {
+                donations = allDonations
+                    .Where(d => d.Medicine.Name.ToLower().Contains(q) ||
+                        d.Medicine.GenericName.ToLower().Contains(q) ||
+                        d.Medicine.Description.ToLower().Contains(q));
+                if (!donations.Any())
+                {
+                    return View(page, allDonations);
+                }
+                return View(page, donations);
+            }
+            catch (Exception)
+            {
+
+                return View(page, allDonations);
+            }
         }
     }
 }

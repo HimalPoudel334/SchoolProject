@@ -1,66 +1,141 @@
-﻿@model SchoolProject.Models.Donation
+@model IEnumerable<SchoolProject.Models.Donation>
 
 @{
     ViewData["Title"] = "Invoice";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Invoice</h1>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 
-<div id="printableArea">
-    <h4>Please courier the medicine with following invoice.</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            Medicine Id
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Medicine.Id)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Medicine.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Medicine.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Donor)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Donor.FirstName) @Html.DisplayFor(model => model.Donor.LastName)
-        </dd>
-        <dt class="col-sm-2">
-            Donation Id
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Id)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Quantity)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Quantity)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ReceiverNgo)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ReceiverNgo.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ReceiverNgo.Address)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ReceiverNgo.Address)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ReceiverNgo.PhoneNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ReceiverNgo.PhoneNumber)
-        </dd>
-    </dl>
-</div>
-<div>
-    <button class="btn btn-primary" onclick="printDiv('printableArea')">Print Invoice</button>
+<div class="page-content container">
+    <div class="page-header text-blue-d2">
+        <div class="page-tools">
+            <div class="action-buttons">
+                <button onclick="printDiv('printableArea')" class="btn bg-white btn-light mx-1px text-95" data-title="Print">
+                    <i class="mr-1 fa fa-print text-primary-m1 text-120 w-2"></i>
+                    Print
+                </button>
+                <a class="btn bg-white btn-light mx-1px text-95" data-title="PDF">
+                    <i class="mr-1 fa fa-file-pdf-o text-danger-m1 text-120 w-2"></i>
+                    Export
+                </a>
+            </div>
+        </div>
+    </div>
+    <div id="printableArea">
+        <div class="container px-0">
+            <div class="row mt-4">
+                <div class="col-12 col-lg-10 offset-lg-1">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="text-center text-150">
+                                <i class="fa fa-book fa-2x text-success-m2 mr-1"></i>
+                                <span class="text-default-d3">Medicine Donation Portal</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- .row -->
+
+                    <hr class="row brc-default-l1 mx-n1 mb-4" />
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div>
+                                <span class="text-sm text-grey-m2 align-middle">Donor @Html.DisplayNameFor(model => model.Donor.Id):</span>
+                                <span class="text-600 text-110 text-blue align-middle">@ViewBag.Donor.UserName</span>
+                            </div>
+                            <div>
+                                <span class="text-sm text-grey-m2 align-middle">Name:</span>
+                                <span class="text-600 text-110 text-blue align-middle">@ViewBag.Donor.FirstName @ViewBag.Donor.LastName</span>
+                            </div>
+                            <div class="text-grey-m2">
+                                <div class="my-1">
+                                    <span class="text-sm text-grey-m2 align-middle">@Html.DisplayNameFor(model => model.Donor.Address):</span>
+                                    <span class="text-600 text-110 align-middle">@ViewBag.Donor.Address</span>
+                                </div>
+                                <div class="my-1"><i class="fa fa-phone fa-flip-horizontal text-secondary"></i> <b class="text-600">@ViewBag.Donor.PhoneNumber</b></div>
+                            </div>
+                        </div>
+                        <!-- /.col -->
+
+                        <div class="text-95 col-sm-6 align-self-start d-sm-flex justify-content-end">
+                            <hr class="d-sm-none" />
+                            <div class="text-grey-m2">
+                                <div class="mt-1 mb-2 text-secondary-m1 text-600 text-125">
+                                    Invoice
+                                </div>
+
+                                <div class="my-2"><i class="fa fa-circle text-blue-m2 text-xs mr-1"></i> <span class="text-600 text-90">ID:</span> #111-222</div>
+
+                                <div class="my-2"><i class="fa fa-circle text-blue-m2 text-xs mr-1"></i> <span class="text-600 text-90">Issue Date: </span>@DateTime.Today</div>
+                                <!--
+                <div class="my-2"><i class="fa fa-circle text-blue-m2 text-xs mr-1"></i> <span class="text-600 text-90">Status:</span>
+                    <span class="badge badge-warning badge-pill px-25">Unpaid</span>
+                </div>
+                -->
+
+
+                            </div>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+
+                    <!-- or use a table instead -->
+
+                    <div class="table-responsive mt-4">
+                        <table class="table table-striped table-borderless border-0 border-b-2 brc-default-l1">
+                            <thead class="bg-none bgc-default-tp1">
+                                <tr class="text-white">
+                                    <th class="opacity-2">Don Id</th>
+                                    <th>Med. Id</th>
+                                    <th>@Html.DisplayNameFor(model => model.Medicine.Name)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Medicine.GenericName)</th>
+                                    <th>@Html.DisplayNameFor(model => model.ReceiverNgo)</th>
+                                    <th>@Html.DisplayNameFor(model => model.ReceiverNgo.Address)</th>
+                                    <th>@Html.DisplayNameFor(model => model.ReceiverNgo.PhoneNumber)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Quantity)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Completed)</th>
+                                </tr>
+                            </thead>
+
+                            <tbody class="text-95 text-secondary-d3">
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Medicine.Id)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Medicine.Name)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Medicine.GenericName)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.ReceiverNgo.Name)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.ReceiverNgo.Address)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.ReceiverNgo.PhoneNumber)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                                        <td>
+                                            @{
+                                                var status = item.Completed ? "Completed" : "Pending";
+                                            }
+                                            @Html.DisplayFor(modelItem => status)
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row border-b-2 brc-default-l2"></div>
+
+                    <div class="row mt-3">
+                        <div class="col-12 col-sm-7 text-grey-d2 mt-2 mt-lg-0">
+                            <p class="text-primary text-105">Note: Please courier the medicines to respective Ngo at their address.</p>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div>
+                        <span class="text-secondary-d1 text-105"><p class="text-center">Thank you for your donation</p></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

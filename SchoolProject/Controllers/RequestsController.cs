@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +44,28 @@ namespace SchoolProject.Controllers
                 return NotFound();
             }
 
+            return View(request);
+        }
+
+        public async Task<IActionResult> Invoice(int? id)
+        {
+            /*int? requestId = Convert.ToInt32(HttpContext.Session.GetString("requestId"));
+            if (id == null || requestId == null || requestId != id)
+            {
+                HttpContext.Session.Remove("requestId");
+                return NotFound();
+            }*/
+            if (id == null) return NotFound();
+
+            var request = await _context.Requests.Include(d => d.Requestor).Include(d => d.Medicine).Include(d => d.RequestingNgo)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (request == null)
+            {
+                HttpContext.Session.Remove("requestId");
+                return NotFound();
+            }
+
+            HttpContext.Session.Remove("requestId");
             return View(request);
         }
 
@@ -102,7 +125,9 @@ namespace SchoolProject.Controllers
 
                 _context.Add(request);
                 await _context.SaveChangesAsync();
-                
+
+                HttpContext.Session.SetString("requestId", request.Id.ToString());
+
                 return RedirectToAction(nameof(Index));
             }
             return View(request);

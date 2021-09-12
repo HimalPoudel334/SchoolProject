@@ -20,14 +20,15 @@
                 <span asp-validation-for="Quantity" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Completed" class="control-label"></label>
-                <input asp-for="Completed" class="form-control" />
-                <span asp-validation-for="Completed" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="DonationTime" class="control-label"></label>
                 <input asp-for="DonationTime" class="form-control" />
                 <span asp-validation-for="DonationTime" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Completed" /> Donation Completed
+                </label>
+                <span asp-validation-for="Completed" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

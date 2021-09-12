@@ -7,70 +7,82 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Medicine)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Donor)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReceiverNgo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DonationTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Completed)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Medicine.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Donor.FirstName) @Html.DisplayFor(modelItem => item.Donor.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReceiverNgo.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DonationTime)
-            </td>
-            @if (item.Completed)
+<div class="row mt-2">
+    <div class="col-sm-8">
+        <a asp-action="Create" class="btn btn-primary" asp-controller="Medicines">Create</a>
+    </div>
+    <div class="col-sm-4">
+        <form class="form-inline my-2 my-lg-0" method="get" asp-action="Search">
+            <input class="form-control mr-sm-2 w-75" type="search" name="q" placeholder="Search" aria-label="Search" />
+            <input name="page" type="hidden" value="Index" />
+            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+</div>
+<div class="container mt-4">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Medicine)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Donor)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ReceiverNgo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Quantity)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DonationTime)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Completed)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
             {
-                <td>
-                    Completed
-                </td>
-            }
-            else
-            {
-                <td>
-                    Pending
-                </td>
-            }
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Medicine.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Donor.FirstName) @Html.DisplayFor(modelItem => item.Donor.LastName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ReceiverNgo.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DonationTime)
+                    </td>
+                    @if (item.Completed)
+                    {
+                        <td>
+                            Completed
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            Pending
+                        </td>
+                    }
 
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
