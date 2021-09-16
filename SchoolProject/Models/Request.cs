@@ -19,6 +19,7 @@ namespace SchoolProject.Models
         [Display(Name = "Request Date")]
         public DateTime RequestDate { get; set; }
 
+        [Display(Name = "Status")]
         public bool Completed { get; set; } = false;
     }
 }

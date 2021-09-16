@@ -31,12 +31,12 @@ namespace SchoolProject.Controllers
         // GET: Donations
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Donations.Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo).ToListAsync());
+            return View(await _context.Donations.AsQueryable().Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo).ToListAsync());
         }
 
         public async Task<IActionResult> DonatedMedicines()
         {
-            var donates = await _context.Donations.Include(d => d.Medicine).Where(d => d.Completed).ToListAsync();
+            var donates = await _context.Donations.AsQueryable().Include(d => d.Medicine).Where(d => d.Completed).ToListAsync();
             return View(donates);
         }
 
@@ -48,11 +48,11 @@ namespace SchoolProject.Controllers
             try {
                 if (await _userManager.IsInRoleAsync(user, "Ngo"))
                 {
-                    donations = await _context.Donations.Include(d => d.Medicine).Include(d => d.Donor).Where(d => d.ReceiverNgo.Id == user.Id).ToListAsync();
+                    donations = await _context.Donations.AsQueryable().Include(d => d.Medicine).Include(d => d.Donor).Where(d => d.ReceiverNgo.Id == user.Id).ToListAsync();
                 }
                 else
                 { 
-                    donations = await _context.Donations.Include(d => d.Medicine).Where(d => d.Donor.Id == user.Id).ToListAsync();
+                    donations = await _context.Donations.AsQueryable().Include(d => d.Medicine).Where(d => d.Donor.Id == user.Id).ToListAsync();
                 }
                 return View(donations);
             }
@@ -74,7 +74,7 @@ namespace SchoolProject.Controllers
             }*/
 
             var user = await _userManager.GetUserAsync(this.User);
-            var donation = await _context.Donations.Include(d => d.Donor).Include(d => d.Medicine).Include(d => d.ReceiverNgo)
+            var donation = await _context.Donations.AsQueryable().Include(d => d.Donor).Include(d => d.Medicine).Include(d => d.ReceiverNgo)
                 .Where(m => m.Donor.Id == user.Id).ToListAsync();
             if (donation == null)
             {
@@ -96,7 +96,7 @@ namespace SchoolProject.Controllers
                 return NotFound();
             }
             var user = await _userManager.GetUserAsync(this.User);
-            var donation = await _context.Donations.Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo)
+            var donation = await _context.Donations.AsQueryable().Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo)
                 .FirstOrDefaultAsync(m => m.Id == id && m.Donor.Id == user.Id);
             if (donation == null)
             {
@@ -119,7 +119,7 @@ namespace SchoolProject.Controllers
                     if (this.User.IsInRole("Ngo"))
                     {
                         var user = await _userManager.GetUserAsync(this.User);
-                        ngos = await _context.Ngos.Where(n => n.Id != user.Id).ToListAsync();
+                        ngos = await _context.Ngos.AsQueryable().Where(n => n.Id != user.Id).ToListAsync();
                     }
                     else
                     {
@@ -183,7 +183,8 @@ namespace SchoolProject.Controllers
                 return NotFound();
             }
 
-            var donation = await _context.Donations.FindAsync(id);
+            var donation = await _context.Donations
+                .FindAsync(id);
             if (donation == null)
             {
                 return NotFound();
@@ -234,6 +235,7 @@ namespace SchoolProject.Controllers
             }
 
             var donation = await _context.Donations
+                .AsQueryable()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (donation == null)
             {

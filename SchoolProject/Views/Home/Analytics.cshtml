@@ -1,0 +1,272 @@
+﻿@{
+
+}
+<div>
+    <div class="row">
+        <div class="col mr-4">
+            <div class="row mb-4">
+                <canvas id="myChart" width="500" height="400"></canvas>
+                <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var donations = parseDataFromJson('@Html.Raw(ViewBag.Donations)');
+                var requests = parseDataFromJson('@Html.Raw(ViewBag.Requests)');
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
+                        datasets: [
+                            {
+                                label: 'Donations',
+                                backgroundColor: 'rgb(255, 99, 132)',
+                                borderColor: 'rgb(255, 99, 132)',
+                                data: donations,
+                            },
+                            {
+                                label: 'Requests',
+                                backgroundColor: 'rgb(240, 199, 32)',
+                                borderColor: 'rgb(240, 199, 32)',
+                                data: requests,
+                            },
+
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                            }
+                        },
+                        responsive: false,
+                        legend: {
+                            position: 'bottom',
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Donations and Requests for the year',
+                            }
+                        }
+                    }
+                });
+
+                function parseDataFromJson(data) {
+                    var obj = JSON.parse(data);
+                    var res = [];
+
+                    for (var i in obj)
+                        res.push(obj[i].count);
+                    return res;
+                }
+
+                function parseLabelsFromJson(data) {
+                    var obj = JSON.parse(data);
+                    var res = [];
+
+                    for (var i in obj)
+                        res.push(obj[i].name);
+                    return res;
+                }
+
+                function generateRandomColorForArray(len) {
+                    var colors = [];
+                    for (var i = 1; i <= len; i++) {
+                        var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                        colors.push(randomColor);
+                    }
+                    return colors;
+                    //random color will be freshly served
+                }
+                </script>
+            </div>
+            <div class="row">
+                <canvas id="monthsTrans" width="500" height="400"></canvas>
+                <script>
+                    ctx = document.getElementById('monthsTrans').getContext('2d');
+                    var jsonObj = JSON.parse('@Html.Raw(ViewBag.MonthsTransactions)')
+                    let labels = Object.keys(jsonObj);
+                    let numbers = Object.values(jsonObj);
+                    console.log(labels);
+                    console.log(numbers);
+                    let colors = generateRandomColorForArray(labels.length);
+                    myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: numbers,
+                                backgroundColor: colors,
+                                borderColor: colors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'This Month Transactions',
+                                }
+                            },
+                        }
+                    });
+                </script>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="row mb-4">
+                <canvas id="donationsPie"></canvas>
+                <script>
+                    ctx = document.getElementById('donationsPie').getContext('2d');
+                    labels = parseLabelsFromJson('@Html.Raw(ViewBag.MostDonations)');
+                    numbers = parseDataFromJson('@Html.Raw(ViewBag.MostDonations)');
+                    colors = generateRandomColorForArray(labels.length);
+                    myChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Frequently Donated Medicines',
+                                data: numbers,
+                                backgroundColor: colors,
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            plugins: {
+                                labels: {
+                                    render: 'value',
+                                    precision: 2
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Frequently Donated Medicines',
+                                },
+                            },
+                        }
+                    });
+                </script>
+            </div>
+            <div class="row">
+                <canvas id="requestsPie"></canvas>
+                <script>
+                    ctx = document.getElementById('requestsPie').getContext('2d');
+                    labels = parseLabelsFromJson('@Html.Raw(ViewBag.MostRequests)')
+                    numbers = parseDataFromJson('@Html.Raw(ViewBag.MostRequests)');
+                    colors = generateRandomColorForArray(labels.length);
+                    myChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Frequently Donated Medicines',
+                                data: numbers,
+                                backgroundColor: colors,
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            plugins: {
+                                labels: {
+                                    render: 'value',
+                                    precision: 2
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Frequently Requested Medicines',
+                                },
+                            },
+                        }
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <h3 class="mt-4 text-center">Todays Transactions</h3>
+    </div>
+    <div class="row">
+        @if (ViewBag.TodaysDonations.Count > 0 && ViewBag.TodaysRequests.Count > 0)
+        {
+            <div>
+                <h5>No Transactions today</h5>
+            </div>
+        }
+        else
+        {
+            @if (ViewBag.TodaysDonations.Count > 0)
+            {
+                <div class="col">
+                    <h5 class="text-center">Donations</h5>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Donor</th>
+                            <th>Receiving Ngo</th>
+                            <th>Quantity</th>
+                            <th></th>
+                        </tr>
+                        @foreach (var item in ViewBag.TodaysDonations)
+                        {
+                            <tr>
+                                <td>@item.Medicine.Name</td>
+                                <td>@item.Donor.FirstName @item.Donor.LastName</td>
+                                <td>@item.ReceiverNgo.Name</td>
+                                <td>@item.Quantity</td>
+                                <td><a asp-action="Details" asp-controller="Donations" asp-route-id="@item.Id">Details</a></td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <h5>No Donations Today</h5>
+                </div>
+            }
+            @if (ViewBag.TodaysRequests.Count > 0)
+            {
+                <div class="col text-center">
+                    <h5>Requests</h5>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Requestor</th>
+                            <th>Donating Ngo</th>
+                            <th>Quantity</th>
+                            <th></th>
+                        </tr>
+                        @foreach (var item in ViewBag.TodaysRequests)
+                        {
+                            <tr>
+                                <td>@item.Medicine.Name</td>
+                                <td>@item.Requestor.FirstName @item.Requestor.LastName</td>
+                                <td>@item.RequestingNgo.Name</td>
+                                <td>@item.Quantity</td>
+                                <td><a asp-action="Details" asp-controller="Requests" asp-route-id="@item.Id">Details</a></td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <h5>No Requests Today</h5>
+                </div>
+            }
+        }
+    </div>
+</div>

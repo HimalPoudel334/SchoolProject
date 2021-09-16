@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -29,6 +30,29 @@ namespace SchoolProject.Controllers
             return View(await _context.Requests.Include(d => d.Medicine).Include(d => d.Requestor).Include(d => d.RequestingNgo).ToListAsync());
         }
 
+        [HttpGet]
+        public async Task<IActionResult> MyRequests()
+        {
+            var user = await _userManager.GetUserAsync(this.User);
+            List<Request> requests = null;
+            try
+            {
+                if (await _userManager.IsInRoleAsync(user, "Ngo"))
+                {
+                    requests = await _context.Requests.Include(d => d.Medicine).Include(d => d.Requestor).Where(d => d.RequestingNgo.Id == user.Id).ToListAsync();
+                }
+                else
+                {
+                    requests = await _context.Requests.Include(d => d.Medicine).Where(d => d.Requestor.Id == user.Id).ToListAsync();
+                }
+                return View(requests);
+            }
+            catch (Exception)
+            {
+                return View();
+            }
+        }
+
         // GET: Requests/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -52,13 +76,16 @@ namespace SchoolProject.Controllers
             /*int? requestId = Convert.ToInt32(HttpContext.Session.GetString("requestId"));
             if (id == null || requestId == null || requestId != id)
             {
-                HttpContext.Session.Remove("requestId");
                 return NotFound();
             }*/
             if (id == null) return NotFound();
 
-            var request = await _context.Requests.Include(d => d.Requestor).Include(d => d.Medicine).Include(d => d.RequestingNgo)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _userManager.GetUserAsync(this.User);
+            var request = await _context.Requests
+                .Include(r => r.Requestor)
+                .Include(r => r.Medicine)
+                .Include(r => r.RequestingNgo)
+                .FirstOrDefaultAsync(r => r.Id == id);
             if (request == null)
             {
                 HttpContext.Session.Remove("requestId");
@@ -213,6 +240,58 @@ namespace SchoolProject.Controllers
         private bool RequestExists(int id)
         {
             return _context.Requests.Any(e => e.Id == id);
+        }
+
+        public async Task<IActionResult> Search(string q, string page)
+        {
+            var pages = new List<string>() //ya unnecessary memory consumption
+            {
+                "Index", "MyRequests"
+            };
+            if (string.IsNullOrEmpty(page) || !pages.Contains(page))
+            {
+                return NotFound();
+            }
+            if (string.IsNullOrEmpty(q))
+            {
+                return RedirectToAction(page);
+            }
+
+            q = q.ToLower();
+            var user = await _userManager.GetUserAsync(this.User);
+            IEnumerable<Request> allRequests = null;
+            IEnumerable<Request> requests = null;
+
+            //yea i know its cheating, but upaya tha xaina
+            if (page.Equals("MyRequests"))
+            {
+                allRequests = await _context.Requests.Include(d => d.Medicine).Where(d => d.Requestor.Id == user.Id).ToListAsync();
+            }
+            else if (page.Equals("Index"))
+            {
+                allRequests = await _context.Requests.Include(d => d.Medicine).Include(d => d.Requestor).Include(d => d.RequestingNgo).ToListAsync();
+            }
+            else if (page.Equals("DonatedMedicines"))
+            {
+                allRequests = await _context.Requests.Include(d => d.Medicine).Where(d => d.Completed).ToListAsync();
+            }
+            try
+            {
+                requests = allRequests
+                    .Where(d => d.Medicine.Name.ToLower().Contains(q) ||
+                        d.Medicine.GenericName.ToLower().Contains(q) ||
+                        d.Medicine.Description.ToLower().Contains(q));
+                if (!requests.Any())
+                {
+                    return View(page, allRequests);
+                }
+                return View(page, requests);
+            }
+            catch (Exception)
+            {
+
+                return View(page, allRequests);
+            }
         }
     }
 }

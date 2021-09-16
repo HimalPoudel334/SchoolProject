@@ -1,0 +1,66 @@
+
+@model IEnumerable<SchoolProject.Models.Request>
+
+@{
+    ViewData["Title"] = "My Donations";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>My Requests</h1>
+
+@if (!Model.Any())
+{
+    @if (User.IsInRole("Ngo"))
+    {
+        <h2>Ops! Looks like there are no requests yet.</h2>
+    }
+    else
+    {
+        <h2>Ops! Looks like you havent requested any medicines yet.</h2>
+        <a asp-action="Create" class="btn btn-primary" asp-controller="Medicines">Donate</a>
+    }
+}
+else
+{
+    <div class="row mt-2">
+        <div class="col-sm-8">
+            <a asp-action="Create" class="btn btn-primary" asp-controller="Medicines">Create</a>
+        </div>
+        <div class="col-sm-4">
+            <form class="form-inline my-2 my-lg-0" method="get" asp-action="Search">
+                <input class="form-control mr-sm-2 w-75" type="search" name="q" placeholder="Search" aria-label="Search" />
+                <input name="page" type="hidden" value="MyRequests" />
+                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    <div class="container mt-4">
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-auto mb-3">
+                    <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <h5 asp-for="" class="card-title">@item.Medicine.Name</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@item.Medicine.GenericName</h6>
+                            <p class="card-text">@item.Medicine.Description</p>
+                            <a asp-action="Details" class="btn btn-primary btn-sm" asp-route-id="@item.Id">Details</a>
+                            @if (DateTime.Compare(DateTime.Now, item.Medicine.ExpiryDate) <= 0)
+                            {
+                                if (User.IsInRole("Ngo"))
+                                {
+                                    <a asp-action="Edit" class="btn btn-primary btn-sm" asp-route-id="@item.Id">Edit</a>
+                                }
+                            }
+                            else
+                            {
+                                <h6 class="bg-danger rounded mt-1 p-2 text-center">Expired</h6>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
