@@ -62,6 +62,11 @@ namespace SchoolProject.Controllers
         {
             if (ModelState.IsValid)
             {
+                if(DateTime.Compare(medicine.ExpiryDate, DateTime.Today.AddMonths(2)) < 0)
+                {
+                    ModelState.AddModelError(string.Empty, "Medicine must have at least 2 months of expiry date");
+                    return View(medicine);
+                }
                 //yea I am ashmed of 
                 string medicineString = JsonConvert.SerializeObject(medicine);
                 HttpContext.Session.SetString("medicine", medicineString);

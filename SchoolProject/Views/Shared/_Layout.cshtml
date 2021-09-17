@@ -24,18 +24,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Medicines" asp-action="Create">Donate</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Donations" asp-action="DonatedMedicines">Request</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Donations" asp-action="MyDonations">My Donations</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Requests" asp-action="MyRequests">MyRequests</a>
-                        </li>
+                        <partial name="_NavItemsPartial" />
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -45,6 +34,10 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            @if (TempData["flashMessage"] != null)
+            {
+                <p class="alert alert-warning" id="successMessage">@TempData["flashMessage"]</p>
+            }
             @RenderBody()
         </main>
     </div>

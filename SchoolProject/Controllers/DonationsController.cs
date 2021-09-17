@@ -280,37 +280,42 @@ namespace SchoolProject.Controllers
 
             q = q.ToLower();
             var user = await _userManager.GetUserAsync(this.User);
-            IEnumerable<Donation> allDonations = null;
+            IQueryable<Donation> allDonations = null;
             IEnumerable<Donation> donations = null;
             
             //yea i know its cheating, but upaya tha xaina
             if (page.Equals("MyDonations"))
             {
-                allDonations = await _context.Donations.Include(d => d.Medicine).Where(d => d.Donor.Id == user.Id).ToListAsync();
+                if(this.User.IsInRole("Ngo"))
+                    allDonations = _context.Donations.Include(d => d.Medicine).Where(d => d.ReceiverNgo.Id == user.Id).AsQueryable();
+                else
+                    allDonations = _context.Donations.Include(d => d.Medicine).Where(d => d.Donor.Id == user.Id).AsQueryable();
             }
             else if (page.Equals("Index"))
             {
-                allDonations = await _context.Donations.Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo).ToListAsync();
+                allDonations = _context.Donations.Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo).AsQueryable();
             }
             else if (page.Equals("DonatedMedicines"))
             {
-                allDonations = await _context.Donations.Include(d => d.Medicine).Where(d => d.Completed).ToListAsync();
+                allDonations = _context.Donations.Include(d => d.Medicine).Where(d => d.Completed).AsQueryable();
             }
             try
             {
-                donations = allDonations
+                donations = await allDonations
                     .Where(d => d.Medicine.Name.ToLower().Contains(q) ||
                         d.Medicine.GenericName.ToLower().Contains(q) ||
-                        d.Medicine.Description.ToLower().Contains(q));
+                        d.Medicine.Description.ToLower().Contains(q))
+                        .ToListAsync();
                 if (!donations.Any())
                 {
-                    return View(page, allDonations);
+                    TempData["flashMessage"] = "No such donations found";
+                    return RedirectToAction(page);
                 }
                 return View(page, donations);
             }
             catch (Exception)
             {
-
+                TempData["flashMessage"] = "No such donations found";
                 return View(page, allDonations);
             }
         }

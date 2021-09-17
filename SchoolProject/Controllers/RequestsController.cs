@@ -62,6 +62,10 @@ namespace SchoolProject.Controllers
             }
 
             var request = await _context.Requests
+                .Include(r => r.Medicine)
+                .Include(r => r.Requestor)
+                .Include(r => r.RequestingNgo)
+                .AsQueryable()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (request == null)
             {
@@ -85,6 +89,7 @@ namespace SchoolProject.Controllers
                 .Include(r => r.Requestor)
                 .Include(r => r.Medicine)
                 .Include(r => r.RequestingNgo)
+                .AsQueryable()
                 .FirstOrDefaultAsync(r => r.Id == id);
             if (request == null)
             {
@@ -137,7 +142,6 @@ namespace SchoolProject.Controllers
                     return View(request);
                 }
 
-                
                 donation.QuantityRemaining -= request.Quantity;
                 var user = await _userManager.GetUserAsync(HttpContext.User);
                 var requestor = await _context.Donors.FindAsync(user.Id);
@@ -259,37 +263,42 @@ namespace SchoolProject.Controllers
 
             q = q.ToLower();
             var user = await _userManager.GetUserAsync(this.User);
-            IEnumerable<Request> allRequests = null;
+            IQueryable<Request> allRequests = null;
             IEnumerable<Request> requests = null;
 
             //yea i know its cheating, but upaya tha xaina
             if (page.Equals("MyRequests"))
             {
-                allRequests = await _context.Requests.Include(d => d.Medicine).Where(d => d.Requestor.Id == user.Id).ToListAsync();
+                if(this.User.IsInRole("Ngo"))
+                    allRequests = _context.Requests.Include(d => d.Medicine).Where(d => d.RequestingNgo.Id == user.Id).AsQueryable();
+                else
+                    allRequests = _context.Requests.Include(d => d.Medicine).Where(d => d.Requestor.Id == user.Id).AsQueryable();
             }
             else if (page.Equals("Index"))
             {
-                allRequests = await _context.Requests.Include(d => d.Medicine).Include(d => d.Requestor).Include(d => d.RequestingNgo).ToListAsync();
+                allRequests = _context.Requests.Include(d => d.Medicine).Include(d => d.Requestor).Include(d => d.RequestingNgo).AsQueryable();
             }
             else if (page.Equals("DonatedMedicines"))
             {
-                allRequests = await _context.Requests.Include(d => d.Medicine).Where(d => d.Completed).ToListAsync();
+                allRequests = _context.Requests.Include(d => d.Medicine).Where(d => d.Completed).AsQueryable();
             }
             try
             {
-                requests = allRequests
+                requests = await allRequests
                     .Where(d => d.Medicine.Name.ToLower().Contains(q) ||
                         d.Medicine.GenericName.ToLower().Contains(q) ||
-                        d.Medicine.Description.ToLower().Contains(q));
+                        d.Medicine.Description.ToLower().Contains(q))
+                    .ToListAsync();
                 if (!requests.Any())
                 {
-                    return View(page, allRequests);
+                    TempData["flashMessage"] = "No such request found";
+                    return RedirectToAction(page);
                 }
                 return View(page, requests);
             }
             catch (Exception)
             {
-
+                TempData["flashMessage"] = "No such request found";
                 return View(page, allRequests);
             }
         }

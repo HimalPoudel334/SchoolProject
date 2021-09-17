@@ -22,13 +22,16 @@
 }
 else
 {
-    <div class="row mt-2">
-        <div class="col-sm-8">
-            <a asp-action="Create" class="btn btn-primary" asp-controller="Medicines">Create</a>
-        </div>
-        <div class="col-sm-4">
+    <div class="row">
+        @if (User.IsInRole("Donor"))
+        {
+            <div class="col">
+                <a asp-action="Create" class="btn btn-primary" asp-controller="Medicines">Create</a>
+            </div>
+        }
+        <div class="col d-flex justify-content-end">
             <form class="form-inline my-2 my-lg-0" method="get" asp-action="Search">
-                <input class="form-control mr-sm-2 w-75" type="search" name="q" placeholder="Search" aria-label="Search" />
+                <input class="form-control mr-sm-2" type="search" name="q" placeholder="Search" aria-label="Search" />
                 <input name="page" type="hidden" value="MyRequests" />
                 <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Search</button>
             </form>
