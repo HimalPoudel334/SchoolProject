@@ -31,15 +31,22 @@
             <dd class="col-sm-10">
                 @Html.DisplayFor(model => model.Requestor.FirstName) @Html.DisplayFor(model => model.Requestor.LastName)
             </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Requestor.Address)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Requestor.Address)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Requestor.PhoneNumber)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Requestor.PhoneNumber)
+            </dd>
+
         }
         else if (User.IsInRole("Donor"))
         {
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Requestor)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Requestor.FirstName) @Html.DisplayFor(model => model.Requestor.LastName)
-            </dd>
             <dt class="col-sm-2">
                 @Html.DisplayNameFor(model => model.RequestingNgo)
             </dt>

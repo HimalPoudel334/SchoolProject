@@ -83,75 +83,47 @@
             <div class="row mb-4">
                 <canvas id="myChart" width="500" height="400"></canvas>
                 <script>
-                var ctx = document.getElementById('myChart').getContext('2d');
-                var donations = parseDataFromJson('@Html.Raw(ViewBag.Donations)');
-                var requests = parseDataFromJson('@Html.Raw(ViewBag.Requests)');
-                var myChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
-                        datasets: [
-                            {
-                                label: 'Donations',
-                                backgroundColor: 'rgb(255, 99, 132)',
-                                borderColor: 'rgb(255, 99, 132)',
-                                data: donations,
-                            },
-                            {
-                                label: 'Requests',
-                                backgroundColor: 'rgb(240, 199, 32)',
-                                borderColor: 'rgb(240, 199, 32)',
-                                data: requests,
-                            },
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var donations = parseDataFromJson('@Html.Raw(ViewBag.Donations)');
+                    var requests = parseDataFromJson('@Html.Raw(ViewBag.Requests)');
+                    var myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
+                            datasets: [
+                                {
+                                    label: 'Donations',
+                                    backgroundColor: 'rgb(255, 99, 132)',
+                                    borderColor: 'rgb(255, 99, 132)',
+                                    data: donations,
+                                },
+                                {
+                                    label: 'Requests',
+                                    backgroundColor: 'rgb(240, 199, 32)',
+                                    borderColor: 'rgb(240, 199, 32)',
+                                    data: requests,
+                                },
 
-                        ]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                            }
+                            ]
                         },
-                        responsive: false,
-                        legend: {
-                            position: 'bottom',
-                        },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Donations and Requests for the year',
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                }
+                            },
+                            responsive: false,
+                            legend: {
+                                position: 'bottom',
+                            },
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Donations and Requests for the year',
+                                }
                             }
                         }
-                    }
-                });
-
-                function parseDataFromJson(data) {
-                    var obj = JSON.parse(data);
-                    var res = [];
-
-                    for (var i in obj)
-                        res.push(obj[i].count);
-                    return res;
-                }
-
-                function parseLabelsFromJson(data) {
-                    var obj = JSON.parse(data);
-                    var res = [];
-
-                    for (var i in obj)
-                        res.push(obj[i].name);
-                    return res;
-                }
-
-                function generateRandomColorForArray(len) {
-                    var colors = [];
-                    for (var i = 1; i <= len; i++) {
-                        var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-                        colors.push(randomColor);
-                    }
-                    return colors;
-                    //random color will be freshly served
-                }
+                    });
                 </script>
             </div>
             <div class="row">

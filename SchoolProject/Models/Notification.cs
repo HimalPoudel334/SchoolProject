@@ -18,7 +18,7 @@ namespace SchoolProject.Models
 
         public IdentityUser User { get; set; }
 
-        public int MyProperty { get; set; }
+        public Medicine Medicine { get; set; }
 
         public Type NotificationType { get; set; }
     }

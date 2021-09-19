@@ -97,7 +97,7 @@ namespace SchoolProject.Controllers
             }
             var user = await _userManager.GetUserAsync(this.User);
             var donation = await _context.Donations.AsQueryable().Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo)
-                .FirstOrDefaultAsync(m => m.Id == id && m.Donor.Id == user.Id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (donation == null)
             {
                 return NotFound();
@@ -158,8 +158,18 @@ namespace SchoolProject.Controllers
                     donation.Donor = await _context.Donors.FindAsync(loggedInUser.Id);
                     donation.ReceiverNgo = await _context.Ngos.FindAsync(donation.ReceiverNgo.Id);
                     donation.QuantityRemaining = donation.Quantity;
-
                     _context.Add(donation);
+
+                    //for notification
+                    Notification notification = new()
+                    {
+                        NotificationType = Models.Type.Donation,
+                        Text = $"{donation.Medicine.Name} medicine donated by {donation.Donor.FirstName} {donation.Donor.LastName}",
+                        User = donation.ReceiverNgo,
+                        Medicine = medFromSession
+                    };
+                    _context.Add(notification);
+
                     await _context.SaveChangesAsync();
                     HttpContext.Session.SetString("donationId", donation.Id.ToString());
                     return RedirectToAction(nameof(MyDonations));
@@ -183,8 +193,8 @@ namespace SchoolProject.Controllers
                 return NotFound();
             }
 
-            var donation = await _context.Donations
-                .FindAsync(id);
+            var donation = await _context.Donations.Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo)
+                .FirstOrDefaultAsync(d => d.Id == id);
             if (donation == null)
             {
                 return NotFound();
@@ -195,7 +205,7 @@ namespace SchoolProject.Controllers
         // POST: Donations/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Quantity,DonationTime,Completed")] Donation donation)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Medicine,ReceiverNgo,Donor,Quantity,DonationTime,Completed")] Donation donation)
         {
             if (id != donation.Id)
             {
@@ -206,8 +216,25 @@ namespace SchoolProject.Controllers
             {
                 try
                 {
+                    //send notification to donor if completed is updated to true
+                    if (donation.Completed)
+                    {
+                        //to much round trip to database. Worst codes ever
+                        donation.ReceiverNgo = await _context.Ngos.FindAsync(donation.ReceiverNgo.Id);
+                        donation.Donor = await _context.Donors.FindAsync(donation.Donor.Id);
+                        donation.Medicine = await _context.Medicines.FindAsync(donation.Medicine.Id);
+                        Notification notification = new()
+                        {
+                            Medicine = donation.Medicine,
+                            Text = $"Your donation of {donation.Medicine.Name} is received by {donation.ReceiverNgo.Name}",
+                            User = donation.Donor,
+                            NotificationType = Models.Type.Donation
+                        };
+                        _context.Add(notification);
+                    }
                     _context.Update(donation);
                     await _context.SaveChangesAsync();
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -260,6 +287,19 @@ namespace SchoolProject.Controllers
         private async Task<bool> DonationExists(int id)
         {
             return await _context.Donations.AnyAsync(e => e.Id == id);
+        }
+
+        //jabarjasti method
+        public async Task<IActionResult> GetDetailsFromMedicineId(int? id)
+        {
+            if(id == null)
+            {
+                return NotFound();
+            }
+            var donation = await _context.Donations.FirstOrDefaultAsync(d => d.Medicine.Id == id);
+            if(donation != null)
+                return RedirectToAction(nameof(Details), new { donation.Id });
+            return NotFound();
         }
 
         //very bad but don't touch it

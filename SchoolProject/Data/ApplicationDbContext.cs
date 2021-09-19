@@ -22,7 +22,11 @@ namespace SchoolProject.Data
         public DbSet<Medicine> Medicines { get; set; }
 
         public DbSet<Feedback> Feedbacks { get; set; }
-        
+
+        public DbSet<Complaint> Complaints { get; set; }
+
+        public DbSet<Notification> Notifications { get; set; }
+
         //scary models
         public DbSet<Donation> Donations { get; set; }
         

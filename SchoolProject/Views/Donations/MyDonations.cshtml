@@ -49,7 +49,7 @@ else
                             <a asp-action="Details" class="btn btn-primary btn-sm" asp-route-id="@item.Id">Details</a>
                             @if (DateTime.Compare(DateTime.Now, item.Medicine.ExpiryDate) <= 0)
                             {
-                                if (User.IsInRole("Ngo"))
+                                if (User.IsInRole("Ngo") && !item.Completed)
                                 {
                                     <a asp-action="Edit" class="btn btn-primary btn-sm" asp-route-id="@item.Id">Edit</a>
                                 }

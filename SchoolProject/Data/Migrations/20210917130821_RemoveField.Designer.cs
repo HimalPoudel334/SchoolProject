@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SchoolProject.Data;
 
 namespace SchoolProject.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210917130821_RemoveField")]
+    partial class RemoveField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -349,9 +351,6 @@ namespace SchoolProject.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("MedicineId")
-                        .HasColumnType("int");
-
                     b.Property<int>("NotificationType")
                         .HasColumnType("int");
 
@@ -366,8 +365,6 @@ namespace SchoolProject.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("MedicineId");
 
                     b.HasIndex("UserId");
 
@@ -538,15 +535,9 @@ namespace SchoolProject.Data.Migrations
 
             modelBuilder.Entity("SchoolProject.Models.Notification", b =>
                 {
-                    b.HasOne("SchoolProject.Models.Medicine", "Medicine")
-                        .WithMany()
-                        .HasForeignKey("MedicineId");
-
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
-
-                    b.Navigation("Medicine");
 
                     b.Navigation("User");
                 });

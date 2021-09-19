@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SchoolProject.Models
 {
-    public class Complaints
+    public class Complaint
     {
         public int Id { get; set; }
 
@@ -15,7 +15,8 @@ namespace SchoolProject.Models
         public DateTime On { get; set; } = DateTime.Today;
         
         [Required]
-        public string Complaint { get; set; }
+        [Display(Name = "Complaint")]
+        public string UserComplaint { get; set; }
         
         [Required]
         public string Suggestion { get; set; }

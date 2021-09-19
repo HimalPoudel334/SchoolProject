@@ -152,9 +152,20 @@ namespace SchoolProject.Controllers
                 request.Medicine = medicine;
                 request.Requestor = requestor;
                 request.RequestingNgo = donorNgo;
+                
                 _context.Donations.Update(donation);
-
                 _context.Add(request);
+
+                //for notification
+                Notification notification = new()
+                {
+                    NotificationType = Models.Type.Request,
+                    Text = $"{medicine.Name} medicine requested by {requestor.FirstName} {requestor.LastName}",
+                    User = donorNgo,
+                    Medicine = medicine
+                };
+                _context.Add(notification);
+
                 await _context.SaveChangesAsync();
 
                 HttpContext.Session.SetString("requestId", request.Id.ToString());
@@ -172,7 +183,8 @@ namespace SchoolProject.Controllers
                 return NotFound();
             }
 
-            var request = await _context.Requests.FindAsync(id);
+            var request = await _context.Requests.Include(r => r.Requestor).Include(r => r.RequestingNgo).Include(r => r.Medicine)
+                .FirstOrDefaultAsync(r => r.Id == id);
             if (request == null)
             {
                 return NotFound();
@@ -182,7 +194,7 @@ namespace SchoolProject.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,RequestDate,Quantity,Completed")] Request request)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Medicine,Requestor,RequestingNgo,RequestDate,Quantity,Completed")] Request request)
         {
             if (id != request.Id)
             {
@@ -193,6 +205,20 @@ namespace SchoolProject.Controllers
             {
                 try
                 {
+                    if (request.Completed)
+                    {
+                        request.Medicine = await _context.Medicines.FindAsync(request.Medicine.Id);
+                        request.Requestor = await _context.Donors.FindAsync(request.Requestor.Id);
+                        request.RequestingNgo = await _context.Ngos.FindAsync(request.RequestingNgo.Id);
+                        Notification notification = new()
+                        {
+                            Text = $"{request.Medicine.Name} received by {request.Requestor.FirstName} {request.Requestor.FirstName}",
+                            NotificationType = Models.Type.Request,
+                            User = await _context.Ngos.FindAsync(request.RequestingNgo.Id),
+                            Medicine = await _context.Medicines.FindAsync(request.Medicine.Id)
+                        };
+                        _context.Notifications.Add(notification);
+                    }
                     _context.Update(request);
                     await _context.SaveChangesAsync();
                 }
@@ -244,6 +270,19 @@ namespace SchoolProject.Controllers
         private bool RequestExists(int id)
         {
             return _context.Requests.Any(e => e.Id == id);
+        }
+
+        //jabarjasti method
+        public async Task<IActionResult> GetDetailsFromMedicineId(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var request = await _context.Requests.FirstOrDefaultAsync(d => d.Medicine.Id == id);
+            if (request != null)
+                return RedirectToAction(nameof(Details), new { request.Id });
+            return NotFound();
         }
 
         public async Task<IActionResult> Search(string q, string page)

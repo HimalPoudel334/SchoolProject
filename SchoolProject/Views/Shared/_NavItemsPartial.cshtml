@@ -21,13 +21,40 @@
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="" asp-controller="Requests" asp-action="Index">Requests</a>
         </li>
-    }else 
+    }
+    else
     {
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Donations" asp-action="MyDonations">My Donations</a>
+            <div class="btn-group">
+                <a class="nav-link text-dark mr-0" asp-area="" asp-controller="Donations" asp-action="MyDonations">My Donations</a>
+                <div id="ddh">
+                    <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dd p-0 btn btn-sm mr-3">
+                        <span id="donationNumber" class="badge badge-pill badge-primary"></span>
+                    </button>
+                    <div class="dropdown-menu dd donations">
+                        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+                        {
+                            @Html.AntiForgeryToken()
+                        }
+                        <button onclick="deleteNotifications(0, '@User.Identity.Name')" class="dropdown-item">Clear Notifications</button>
+                        <div class="dropdown-divider"></div>
+                    </div>
+                </div>
+            </div>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="" asp-controller="Requests" asp-action="MyRequests">My Requests</a>
+            <div class="btn-group">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Requests" asp-action="MyRequests">My Requests</a>
+                <div id="dhr">
+                    <button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dd p-0 btn btn-sm mr-3">
+                        <span id="requestNumber" class="badge badge-pill badge-primary"></span>
+                    </button>
+                    <div class="dropdown-menu dd requests">
+                        <button onclick="deleteNotifications(1, '@User.Identity.Name')" class="dropdown-item">Clear Notifications</button>
+                        <div class="dropdown-divider"></div>
+                    </div>
+                </div>
+            </div>
         </li>
     }
 }

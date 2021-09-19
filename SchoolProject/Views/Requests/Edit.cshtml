@@ -14,6 +14,9 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Medicine.Id" />
+            <input type="hidden" asp-for="Requestor.Id" />
+            <input type="hidden" asp-for="RequestingNgo.Id" />
             <div class="form-group">
                 <label asp-for="RequestDate" class="control-label"></label>
                 <input asp-for="RequestDate" class="form-control" />
