@@ -15,7 +15,13 @@
             @Html.DisplayNameFor(model => model.Medicine)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Medicine.Name) (@Html.DisplayFor(model => model.Medicine.GenericName))
+            @Html.DisplayFor(model => model.Medicine.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Medicine)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Medicine.GenericName)
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Medicine.Description)
@@ -29,18 +35,63 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Quantity)
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Donor)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Donor.FirstName) @Html.DisplayFor(model => model.Donor.LastName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.ReceiverNgo)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.ReceiverNgo.Name)
-        </dd>
+        @if (User.IsInRole("Ngo"))
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Donor)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Donor.FirstName) @Html.DisplayFor(model => model.Donor.LastName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Donor.Address)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Donor.Address)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Donor.PhoneNumber)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Donor.PhoneNumber)
+            </dd>
+        }
+        else if (User.IsInRole("Admin"))
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Donor)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Donor.FirstName) @Html.DisplayFor(model => model.Donor.LastName)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ReceiverNgo)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ReceiverNgo.Name)
+            </dd>
+        }
+        else if (User.IsInRole("Donor"))
+        {
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ReceiverNgo)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ReceiverNgo.Name)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ReceiverNgo.Address)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ReceiverNgo.Address)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.ReceiverNgo.PhoneNumber)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.ReceiverNgo.PhoneNumber)
+            </dd>
+        }
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.DonationTime)
         </dt>
@@ -57,6 +108,14 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    @if (!User.IsInRole("Donor") && !Model.Completed)
+    {<a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>}
+    @if (User.IsInRole("Admin"))
+    {
+        <a class="btn btn-secondary btn-sm" asp-action="Index">Back to List</a>
+    }
+    else
+    {
+        <a class="btn btn-secondary btn-sm" asp-action="MyDonations">Back to List</a>
+    }
 </div>

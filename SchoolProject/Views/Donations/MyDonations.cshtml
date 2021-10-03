@@ -23,11 +23,12 @@
 else
 {
     <div class="row">
-        @if (User.IsInRole("Donor")) { 
-            <div class="col">
-                <a asp-action="Create" class="btn btn-primary" asp-controller="Medicines">Create</a>
-            </div>
-        }
+        <div class="col">
+            @if (User.IsInRole("Donor")) { 
+                <a asp-action="Invoice" class="btn btn-primary btn-sm">Generate Invoice</a>
+                <a asp-action="Create" class="btn btn-primary btn-sm" asp-controller="Medicines">New Donation</a>
+            }
+        </div>
         <div class="col d-flex justify-content-end">
             <form class="form-inline my-2 my-lg-0" method="get" asp-action="Search">
                 <input class="form-control mr-sm-2" type="search" name="q" placeholder="Search" aria-label="Search" />
@@ -46,6 +47,18 @@ else
                             <h5 asp-for="" class="card-title">@item.Medicine.Name</h5>
                             <h6 class="card-subtitle mb-2 text-muted">@item.Medicine.GenericName</h6>
                             <p class="card-text">@item.Medicine.Description</p>
+                            @if (User.IsInRole("Ngo"))
+                            {
+                                <p class="card-text">Donor: @item.Donor.FirstName @item.Donor.LastName</p>
+                            }
+                            else if (User.IsInRole("Donor"))
+                            {
+                                <p class="card-text">To: @item.ReceiverNgo.Name</p>
+                            }
+                            <p class="card-text">@Html.DisplayNameFor(modelItem => item.Completed):
+                                @{ var status = item.Completed? "Completed" : "Pending";}
+                                @Html.DisplayFor(modelItem => status)
+                            </p>
                             <a asp-action="Details" class="btn btn-primary btn-sm" asp-route-id="@item.Id">Details</a>
                             @if (DateTime.Compare(DateTime.Now, item.Medicine.ExpiryDate) <= 0)
                             {

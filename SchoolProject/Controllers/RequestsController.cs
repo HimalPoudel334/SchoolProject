@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +12,13 @@ using SchoolProject.Models;
 
 namespace SchoolProject.Controllers
 {
+    [Authorize]
     public class RequestsController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
-        private static Donation don;
+        //private static Donation don;
 
         public RequestsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
@@ -25,6 +27,7 @@ namespace SchoolProject.Controllers
         }
 
         // GET: Requests
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Requests.Include(d => d.Medicine).Include(d => d.Requestor).Include(d => d.RequestingNgo).ToListAsync());
@@ -43,7 +46,7 @@ namespace SchoolProject.Controllers
                 }
                 else
                 {
-                    requests = await _context.Requests.Include(d => d.Medicine).Where(d => d.Requestor.Id == user.Id).ToListAsync();
+                    requests = await _context.Requests.Include(d => d.Medicine).Include(d => d.RequestingNgo).Where(d => d.Requestor.Id == user.Id).ToListAsync();
                 }
                 return View(requests);
             }
@@ -75,14 +78,13 @@ namespace SchoolProject.Controllers
             return View(request);
         }
 
-        public async Task<IActionResult> Invoice(int? id)
+        public async Task<IActionResult> Invoice()
         {
             /*int? requestId = Convert.ToInt32(HttpContext.Session.GetString("requestId"));
             if (id == null || requestId == null || requestId != id)
             {
                 return NotFound();
             }*/
-            if (id == null) return NotFound();
 
             var user = await _userManager.GetUserAsync(this.User);
             var request = await _context.Requests
@@ -90,7 +92,8 @@ namespace SchoolProject.Controllers
                 .Include(r => r.Medicine)
                 .Include(r => r.RequestingNgo)
                 .AsQueryable()
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .Where(r => r.Requestor.Id == user.Id)
+                .ToListAsync();
             if (request == null)
             {
                 HttpContext.Session.Remove("requestId");
@@ -110,7 +113,7 @@ namespace SchoolProject.Controllers
             }
             try
             {
-                don = await _context.Donations.Include(d => d.ReceiverNgo).Include(d => d.Medicine).FirstAsync(d => d.Id == id);
+                var don = await _context.Donations.Include(d => d.ReceiverNgo).Include(d => d.Medicine).FirstAsync(d => d.Id == id);
                 var request = new Request()
                 {
                     Medicine = don.Medicine,
@@ -132,13 +135,13 @@ namespace SchoolProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                var donation = await _context.Donations.FindAsync(don.Id);
+                var donation = await _context.Donations.Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo).FirstOrDefaultAsync(d => d.Medicine.Id == request.Medicine.Id);
                 if (request.Quantity > donation.QuantityRemaining || request.Quantity <= 0)
                 {
-                    ModelState.AddModelError(string.Empty, "Only " + don.QuantityRemaining + " Medicines left in stock");
+                    ModelState.AddModelError(string.Empty, "Only " + donation.QuantityRemaining + " Medicines left in stock");
                     ModelState.AddModelError(string.Empty, "Quantity must be greater than zero");
-                    request.Medicine = don.Medicine;
-                    request.RequestingNgo = don.ReceiverNgo;
+                    request.Medicine = donation.Medicine;
+                    request.RequestingNgo = donation.ReceiverNgo;
                     return View(request);
                 }
 
@@ -169,8 +172,8 @@ namespace SchoolProject.Controllers
                 await _context.SaveChangesAsync();
 
                 HttpContext.Session.SetString("requestId", request.Id.ToString());
-
-                return RedirectToAction(nameof(Index));
+                TempData["flashMessage"] = "Request Successful";
+                return RedirectToAction(nameof(MyRequests));
             }
             return View(request);
         }
@@ -233,7 +236,9 @@ namespace SchoolProject.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                TempData["flashMessage"] = "Update Successful";
+
+                return RedirectToAction(nameof(MyRequests));
             }
             return View(request);
         }
@@ -257,6 +262,7 @@ namespace SchoolProject.Controllers
         }
 
         // POST: Requests/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -264,6 +270,8 @@ namespace SchoolProject.Controllers
             var request = await _context.Requests.FindAsync(id);
             _context.Requests.Remove(request);
             await _context.SaveChangesAsync();
+            TempData["flashMessage"] = "Deletion Successful";
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -309,9 +317,9 @@ namespace SchoolProject.Controllers
             if (page.Equals("MyRequests"))
             {
                 if(this.User.IsInRole("Ngo"))
-                    allRequests = _context.Requests.Include(d => d.Medicine).Where(d => d.RequestingNgo.Id == user.Id).AsQueryable();
+                    allRequests = _context.Requests.Include(d => d.Medicine).Include(d => d.RequestingNgo).Where(d => d.RequestingNgo.Id == user.Id).AsQueryable();
                 else
-                    allRequests = _context.Requests.Include(d => d.Medicine).Where(d => d.Requestor.Id == user.Id).AsQueryable();
+                    allRequests = _context.Requests.Include(d => d.Medicine).Include(d => d.RequestingNgo).Where(d => d.Requestor.Id == user.Id).AsQueryable();
             }
             else if (page.Equals("Index"))
             {
@@ -319,7 +327,7 @@ namespace SchoolProject.Controllers
             }
             else if (page.Equals("DonatedMedicines"))
             {
-                allRequests = _context.Requests.Include(d => d.Medicine).Where(d => d.Completed).AsQueryable();
+                allRequests = _context.Requests.Include(d => d.Medicine).Include(d => d.RequestingNgo).Where(d => d.Completed).AsQueryable();
             }
             try
             {

@@ -41,19 +41,19 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div>
-                                    <span class="text-sm text-grey-m2 align-middle">Requestor @Html.DisplayNameFor(mdoel => mdoel.Requestor.Id)</span>
-                                    <span class="text-600 text-110 text-blue align-middle">@Html.DisplayFor(mdoel => mdoel.Requestor.UserName)</span>
+                                    <span class="text-sm text-grey-m2 align-middle">Donor @Html.DisplayNameFor(model => model.Requestor.Id):</span>
+                                    <span class="text-600 text-110 text-blue align-middle">@ViewBag.Requestor.UserName</span>
                                 </div>
                                 <div>
                                     <span class="text-sm text-grey-m2 align-middle">Name:</span>
-                                    <span class="text-600 text-110 text-blue align-middle">@Html.DisplayFor(mdoel => mdoel.Requestor.FirstName) @Html.DisplayFor(mdoel => mdoel.Requestor.LastName)</span>
+                                    <span class="text-600 text-110 text-blue align-middle">@ViewBag.Requestor.FirstName @ViewBag.Requestor.LastName</span>
                                 </div>
                                 <div class="text-grey-m2">
                                     <div class="my-1">
-                                        <span class="text-sm text-grey-m2 align-middle">@Html.DisplayNameFor(mdoel => mdoel.Requestor.Address):</span>
-                                        <span class="text-600 text-110 align-middle">@Html.DisplayFor(mdoel => mdoel.Requestor.Address)</span>
+                                        <span class="text-sm text-grey-m2 align-middle">@Html.DisplayNameFor(model => model.Requestor.Address):</span>
+                                        <span class="text-600 text-110 align-middle">@ViewBag.Requestor.Address</span>
                                     </div>
-                                    <div class="my-1"><i class="fa fa-phone fa-flip-horizontal text-secondary"></i> <b class="text-600">@Html.DisplayFor(mdoel => mdoel.Requestor.PhoneNumber)</b></div>
+                                    <div class="my-1"><i class="fa fa-phone fa-flip-horizontal text-secondary"></i> <b class="text-600">@ViewBag.Requestor.PhoneNumber</b></div>
                                 </div>
                             </div>
                             <!-- /.col -->

@@ -118,31 +118,5 @@ function printDiv(divName) {
     document.body.innerHTML = originalContents;
 }
 
-function parseDataFromJson(data) {
-    var obj = JSON.parse(data);
-    var res = [];
 
-    for (var i in obj)
-        res.push(obj[i].count);
-    return res;
-}
-
-function parseLabelsFromJson(data) {
-    var obj = JSON.parse(data);
-    var res = [];
-
-    for (var i in obj)
-        res.push(obj[i].name);
-    return res;
-}
-
-function generateRandomColorForArray(len) {
-    var colors = [];
-    for (var i = 1; i <= len; i++) {
-        var randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-        colors.push(randomColor);
-    }
-    return colors;
-    //random color will be freshly served
-}
 

@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access">
+  <Class Name="SchoolProject.Models.Complaint">
+    <Position X="7" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAIAAAAAAAAAAAAAAABAAAAAAAAAAAgIA=</HashCode>
+      <FileName>Models\Complaint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SchoolProject.Models.Donation">
+    <Position X="10.5" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAQAAAIAAAIAAAAAAAAAAIAAAAAQgAAACAA=</HashCode>
+      <FileName>Models\Donation.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SchoolProject.Models.Donor">
+    <Position X="12.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAAAAAgAAAAAAAAAAAAACAAAAABAAAAg=</HashCode>
+      <FileName>Models\Donor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SchoolProject.Models.ErrorViewModel">
+    <Position X="1.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\ErrorViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SchoolProject.Models.Feedback">
+    <Position X="7" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAEAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>Models\Feedback.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SchoolProject.Models.Medicine">
+    <Position X="10.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAGAAAAAAQgAAAAgAAEAAQAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Medicine.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SchoolProject.Models.Ngo">
+    <Position X="14" Y="3" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAAAAAQAAAAAAFAGAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Ngo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SchoolProject.Models.Notification">
+    <Position X="8.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQADAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAACAAACAA=</HashCode>
+      <FileName>Models\Notification.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SchoolProject.Models.Request">
+    <Position X="8.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAIAAAEAAAAAAAAAAAAAAAAAgQAASAA=</HashCode>
+      <FileName>Models\Request.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.AspNetCore.Identity.IdentityUser">
+    <Position X="12.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Enum Name="SchoolProject.Models.Type">
+    <Position X="7" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Notification.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

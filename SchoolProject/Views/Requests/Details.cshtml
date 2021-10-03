@@ -85,7 +85,7 @@
     </dl>
 </div>
 <div>
-    @if (!User.IsInRole("Ngo"))
+    @if (User.IsInRole("Ngo") && !Model.Completed)
     {
         <a asp-action="Edit" class="btn btn-primary btn-sm" asp-route-id="@Model.Id">Edit</a>
     }

@@ -52,7 +52,7 @@ namespace SchoolProject.Controllers
                 }
                 else
                 { 
-                    donations = await _context.Donations.AsQueryable().Include(d => d.Medicine).Where(d => d.Donor.Id == user.Id).ToListAsync();
+                    donations = await _context.Donations.AsQueryable().Include(d => d.Medicine).Include(d => d.ReceiverNgo).Where(d => d.Donor.Id == user.Id).ToListAsync();
                 }
                 return View(donations);
             }
@@ -75,7 +75,7 @@ namespace SchoolProject.Controllers
 
             var user = await _userManager.GetUserAsync(this.User);
             var donation = await _context.Donations.AsQueryable().Include(d => d.Donor).Include(d => d.Medicine).Include(d => d.ReceiverNgo)
-                .Where(m => m.Donor.Id == user.Id).ToListAsync();
+                .Where(m => m.Donor.Id == user.Id && !m.Completed).ToListAsync();
             if (donation == null)
             {
                 HttpContext.Session.Remove("donationId");
@@ -157,9 +157,8 @@ namespace SchoolProject.Controllers
                     var loggedInUser = await _userManager.GetUserAsync(HttpContext.User);
                     donation.Donor = await _context.Donors.FindAsync(loggedInUser.Id);
                     donation.ReceiverNgo = await _context.Ngos.FindAsync(donation.ReceiverNgo.Id);
-                    donation.QuantityRemaining = donation.Quantity;
                     _context.Add(donation);
-
+                    donation.QuantityRemaining = donation.Quantity;
                     //for notification
                     Notification notification = new()
                     {
@@ -172,6 +171,7 @@ namespace SchoolProject.Controllers
 
                     await _context.SaveChangesAsync();
                     HttpContext.Session.SetString("donationId", donation.Id.ToString());
+                    TempData["flashMessage"] = "Donation Successful";
                     return RedirectToAction(nameof(MyDonations));
 
                 }
@@ -219,7 +219,7 @@ namespace SchoolProject.Controllers
                     //send notification to donor if completed is updated to true
                     if (donation.Completed)
                     {
-                        //to much round trip to database. Worst codes ever
+                        //too much round trip to database. Worst codes ever
                         donation.ReceiverNgo = await _context.Ngos.FindAsync(donation.ReceiverNgo.Id);
                         donation.Donor = await _context.Donors.FindAsync(donation.Donor.Id);
                         donation.Medicine = await _context.Medicines.FindAsync(donation.Medicine.Id);
@@ -234,7 +234,7 @@ namespace SchoolProject.Controllers
                     }
                     _context.Update(donation);
                     await _context.SaveChangesAsync();
-
+                    TempData["flashMessage"] = "Update successful";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -281,6 +281,7 @@ namespace SchoolProject.Controllers
             var donation = await _context.Donations.FindAsync(id);
             _context.Donations.Remove(donation);
             await _context.SaveChangesAsync();
+            TempData["flashMessage"] = "Deletion successfull";
             return RedirectToAction(nameof(Index));
         }
 
@@ -327,17 +328,17 @@ namespace SchoolProject.Controllers
             if (page.Equals("MyDonations"))
             {
                 if(this.User.IsInRole("Ngo"))
-                    allDonations = _context.Donations.Include(d => d.Medicine).Where(d => d.ReceiverNgo.Id == user.Id).AsQueryable();
+                    allDonations = _context.Donations.Include(d => d.Medicine).Include(d => d.ReceiverNgo).Where(d => d.ReceiverNgo.Id == user.Id).AsQueryable();
                 else
-                    allDonations = _context.Donations.Include(d => d.Medicine).Where(d => d.Donor.Id == user.Id).AsQueryable();
+                    allDonations = _context.Donations.Include(d => d.Medicine).Include(d => d.ReceiverNgo).Where(d => d.Donor.Id == user.Id).AsQueryable();
             }
             else if (page.Equals("Index"))
             {
-                allDonations = _context.Donations.Include(d => d.Medicine).Include(d => d.Donor).Include(d => d.ReceiverNgo).AsQueryable();
+                allDonations = _context.Donations.Include(d => d.Medicine).Include(d => d.ReceiverNgo).Include(d => d.Donor).Include(d => d.ReceiverNgo).AsQueryable();
             }
             else if (page.Equals("DonatedMedicines"))
             {
-                allDonations = _context.Donations.Include(d => d.Medicine).Where(d => d.Completed).AsQueryable();
+                allDonations = _context.Donations.Include(d => d.Medicine).Include(d => d.ReceiverNgo).Where(d => d.Completed).AsQueryable();
             }
             try
             {
